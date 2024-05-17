@@ -26,5 +26,9 @@ app.route('/api/users/:id')
     return res.json({status:"pending"})
 })
 
+app.post("/api/users", (req,res) =>{
+    return res.json({status: "pending"})
+})
+
 
 app.listen(PORT, () => console.log(`server is started :${PORT}`));
