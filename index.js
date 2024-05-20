@@ -9,11 +9,23 @@ const PORT = 7000;
 
 app.use(express.urlencoded({ extended: false })); // middleware - Plugin
 
+
+app.use((req, res, next)=>{
+  console.log("middleware 1")
+   next();                       
+                  // middleware 1
+});
+
+app.use((req, res, next) =>{
+  console.log("middleware 2")
+  next();
+})
+
 app.get("/api/users", (req, res) => {
   return res.json(users);
 });
 
-app.route("/api/users/:gender/:id");
+app.route("/api/users/:gender/:id")
 
 // get the users accridng to thier id
 app.get("/api/users/id/:id", (req, res) => {
@@ -25,7 +37,7 @@ app.get("/api/users/id/:id", (req, res) => {
   } else {
     return res.status(404).json({ error: "User not found" });
   }
-});
+})
 
 
 
@@ -43,14 +55,15 @@ app.get("/api/users/gender/:gender", (req, res) => {
       .status(404)
       .json({ error: "No users found with the specified gender" });
   }
-});
+})
 
-
-app
-  .patch("/api/users", (req, res) => {
-    const body = req.body;
-    users.push({ ...body });
+app.patch("/api/users/id/:id", (req, res) => {
+    req.params.id *1;
+  const result = users.find((result) => result.id === id);
   })
+  
+  
+  
   .delete((req, res) => {
     return res.json({ status: "pending" });
   });
