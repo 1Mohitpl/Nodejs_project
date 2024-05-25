@@ -1,11 +1,54 @@
 const express = require("express");
 const users = require("./MOCK_DATA.json");
+const mongoose = require("mongoose");
 const fs = require("fs");
+const { type } = require("os");
 
 
 
 const app = express();
 const PORT = 7000;
+
+
+//mongoDB connections
+
+mongoose.connect("mongodb://127.0.0.1:27017/instgram-app-1")
+.then(()=>console.log("MongoDb is connected"))
+.catch((err)=> console.log("Mongo error", err));
+
+
+//create schema
+
+const userSchema = new mongoose.Schema({ 
+     first_name : {
+      type:String,
+       required : true,
+     },
+
+     last_name : {
+       type: String,
+       required: false,     
+  },
+
+    email : {
+      type: String,
+      required:true,
+      unique: true,
+
+    },
+    Job_title:{
+      type: String
+    }
+   
+});
+
+
+//create model
+const userData = mongoose.model("userData",userSchema);
+
+
+
+
 
 app.use(express.urlencoded({ extended: false })); // middleware - Plugin
 
