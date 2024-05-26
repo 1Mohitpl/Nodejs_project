@@ -60,7 +60,7 @@ app.use((req, res, next)=>{
 });
 
 app.use((req, res, next) =>{
-  console.log("middleware 2")
+  console.log("middleware 2")    //middleware 2
   next();
 })
 
