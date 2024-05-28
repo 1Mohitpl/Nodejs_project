@@ -1,5 +1,4 @@
 const express = require("express");
-const users = require("./MOCK_DATA.json");
 const mongoose = require("mongoose");
 const fs = require("fs");
 const { type } = require("os");
@@ -67,20 +66,21 @@ app.use((req, res, next) =>{
   next();
 })
 
-app.get("/api/users", (req, res) => {
-  res.setHeader("myname", "mohit paul");    //custom header; always add x TO custom headers
-  return res.json(users);
+app.get("/api/users", async(req, res) => {
+  const alldbusers = await customer.find({});
+  // res.setHeader("myname", "mohit paul");    //custom header; always add x TO custom headers
+  return res.json(alldbusers);
 });
 
 app.route("/api/users/:gender/:id")
 
 // get the users accridng to thier id
-app.get("/api/users/id/:id", (req, res) => {
-  const id = Number(req.params.id);
-  const user = users.find((user) => user.id === id);
+app
+.get("/api/users/id/:id", async (req, res) => {
+  const userid = await customer.findById(req.params.id);
 
-  if (user) {
-    return res.json(user);
+if (userid) {
+    return res.json(userid);
   } else {
     return res.status(404).json({ error: "User not found" });
   }
@@ -104,15 +104,17 @@ app.get("/api/users/gender/:gender", (req, res) => {
   }
 })
 
-app.patch("/api/users/id/:id", (req, res) => {
-    req.params.id *1;
-  const result = users.find((result) => result.id === id);
+app.patch("/api/users/id/:id", async(req, res) => {
+
+  await customer.findByIdAndUpdate(req.params.id, {last_name:"saha"});
+  return res.json({status: "success"});
+    // req.params.id *1;
+  // const result = users.find((result) => result.id === id);
   })
   
-  
-  
-  .delete((req, res) => {
-    return res.json({ status: "pending" });
+  app.delete("/api/users/id/:id",async (req, res) => {
+    await customer.findByIdAndDelete(req.params.id)
+    return res.json({ status: "succuss" });
   });
 
 app.post("/api/users", async(req, res) => {
