@@ -21,7 +21,7 @@ mongoose.connect("mongodb://127.0.0.1:27017/instgram-app-1")
 
 const userSchema = new mongoose.Schema({ 
      first_name : {
-      type:String,
+      type: String,
        required : true,
      },
 
@@ -38,13 +38,16 @@ const userSchema = new mongoose.Schema({
     },
     Job_title:{
       type: String
+    },
+
+    gender:{
+      type: String
     }
    
-});
-
+},{timestamps : true});
 
 //create model
-const userData = mongoose.model("userData",userSchema);
+const customer = mongoose.model("customer",userSchema);
 
 
 
@@ -112,13 +115,30 @@ app.patch("/api/users/id/:id", (req, res) => {
     return res.json({ status: "pending" });
   });
 
-app.post("/api/users", (req, res) => {
+app.post("/api/users", async(req, res) => {
   const body = req.body;
-  users.push({ ...body, id: users.length + 1 });
-  fs.writeFile("./MOCK_DATA.json", JSON.stringify(users), (err, data) => {
-    return res.json({ status: "pending" });
-  });
+  
+  if(
+    !body ||
+    !body.first_name||
+    !body.last_name||
+    !body.email||
+    !body.gender||
+    !body.Job_title
+  ){
+     return res.status(400).json({msg: "all fields are required..."});
+  }
+    
+const result = await customer.create({
+  first_name :body.first_name,
+  last_name : body.last_name,
+  email: body.email,
+  gender:body.gender,
+  Job_title:body.Job_title,
+});
+console.log("result is here :", result)
 
+return res.status(201).json({msg: "Success"})
   // to-do create an new user
 });
 
