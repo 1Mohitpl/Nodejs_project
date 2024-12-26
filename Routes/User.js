@@ -1,94 +1,97 @@
 const express = require("express");
-
+const customers = require("../MOCK_DATA.json"); // Load mock data as an array
 const router = express.Router();
 
-router.use((req, res, next)=>{
-    console.log("middleware 1")
-     next();                       
-                    // middleware 1
-  });
-  
-  router.use((req, res, next) =>{
-    console.log("middleware 2")    //middleware 2
-    next();
-  })
-  
-  router.get("/", async(req, res) => {
-    const alldbusers = await customer.find({});
-    // res.setHeader("myname", "mohit paul");    //custom header; always add x TO custom headers
-    return res.json(alldbusers);
-  });
-  
-  router.route(":gender/:id")
-  
-  // get the users accridng to thier id
-  router
-  .get("id/:id", async (req, res) => {
-    const userid = await customer.findById(req.params.id);
-  
-  if (userid) {
-      return res.json(userid);
-    } else {
-      return res.status(404).json({ error: "User not found" });
-    }
-  })
-  
-  
-  
-  // for get the user accoring to their gender
-  router.get("gender/:gender", (req, res) => {
-    const gender = req.params.gender.toLowerCase();
-    const filteredUsers = users.filter(
-      (user) => user.gender.toLowerCase() === gender
-    );
-  
-    if (filteredUsers.length > 0) {
-      return res.json(filteredUsers);
-    } else {
-      return res
-        .status(404)
-        .json({ error: "No users found with the specified gender" });
-    }
-  })
-  
-  router.patch("id/:id", async(req, res) => {
-  
-    await customer.findByIdAndUpdate(req.params.id, {last_name:"saha"});
-    return res.json({status: "success"});
-      // req.params.id *1;
-    // const result = users.find((result) => result.id === id);
-    })
-    
-    router.delete("id/:id",async (req, res) => {
-      await customer.findByIdAndDelete(req.params.id)
-      return res.json({ status: "succuss" });
-    });
-  
-    router.post("/", async(req, res) => {
-    const body = req.body;
-    
-    if(
-      !body ||
-      !body.first_name||
-      !body.last_name||
-      !body.email||
-      !body.gender||
-      !body.Job_title
-    ){
-       return res.status(400).json({msg: "all fields are required..."});
-    }
-      
-  const result = await customer.create({
-    first_name :body.first_name,
-    last_name : body.last_name,
-    email: body.email,
-    gender:body.gender,
-    Job_title:body.Job_title,
-  });
-  console.log("result is here :", result)
-  
-  return res.status(201).json({msg: "Success"})
-    // to-do create an new user
-  });
+// Middleware 1
+router.use((req, res, next) => {
+  console.log("Middleware 1 - Time:", Date.now());
+  next();
+});
 
-  module.exports = router();
+// Middleware 2
+router.use((req, res, next) => {
+  console.log("Middleware 2 - Time:", Date.now());
+  next();
+});
+
+// Get all users
+router.get("/", (req, res) => {
+  return res.json(customers); // Respond with all users
+});
+
+// Get user by ID
+router.get("/id/:id", (req, res) => {
+  const userId = parseInt(req.params.id, 10); // Convert ID to a number
+  const user = customers.find((customer) => customer.id === userId);
+
+  if (user) {
+    return res.json(user);
+  } else {
+    return res.status(404).json({ error: "User not found" });
+  }
+});
+
+// Get users by gender
+router.get("/gender/:gender", (req, res) => {
+  const gender = req.params.gender.toLowerCase();
+  const filteredUsers = customers.filter(
+    (user) => user.gender.toLowerCase() === gender
+  );
+
+  if (filteredUsers.length > 0) {
+    return res.json(filteredUsers);
+  } else {
+    return res.status(404).json({ error: "No users found with the specified gender" });
+  }
+});
+
+// Update user by ID (PATCH)
+router.patch("/id/:id", (req, res) => {
+  const userId = parseInt(req.params.id, 10);
+  const user = customers.find((customer) => customer.id === userId);
+
+  if (user) {
+    const { last_name } = req.body;
+    if (last_name) user.last_name = last_name; // Update last name
+    return res.json({ status: "success", updatedUser: user });
+  } else {
+    return res.status(404).json({ error: "User not found" });
+  }
+});
+
+// Delete user by ID
+router.delete("/id/:id", (req, res) => {
+  const userId = parseInt(req.params.id, 10);
+  const userIndex = customers.findIndex((customer) => customer.id === userId);
+
+  if (userIndex !== -1) {
+    const deletedUser = customers.splice(userIndex, 1); // Remove user
+    return res.json({ status: "success", deletedUser });
+  } else {
+    return res.status(404).json({ error: "User not found" });
+  }
+});
+
+// Create a new user
+router.post("/", (req, res) => {
+  const { first_name, last_name, email, gender, Job_title } = req.body;
+
+  if (!first_name || !last_name || !email || !gender || !Job_title) {
+    return res.status(400).json({ error: "All fields are required" });
+  }
+
+  const newUser = {
+    id: customers.length + 1, // Generate a new ID
+    first_name,
+    last_name,
+    email,
+    gender,
+    Job_title,
+  };
+
+  customers.push(newUser); // Add the new user to the array
+  return res.status(201).json({ msg: "User created successfully", newUser });
+});
+
+module.exports = router;
+
