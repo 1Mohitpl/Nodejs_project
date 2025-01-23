@@ -2,11 +2,15 @@ const express = require("express");
 const fs = require("fs");
 const {connectionMongoDB} = require('./connection')
 const userRouter = require("./Routes/User")
+const mongoose = require("mongoose");
 
 const app = express();
 const PORT = 7000;
 
 //connections
+
+
+
 
 connectionMongoDB("mongodb://127.0.0.1:27017/instgram-app-1");
 
@@ -52,8 +56,6 @@ connectionMongoDB("mongodb://127.0.0.1:27017/instgram-app-1");
    
 // },{timestamps : true});
 
-// //create model
-// const customer = mongoose.model("customer",userSchema);
 
 
 
@@ -61,7 +63,7 @@ connectionMongoDB("mongodb://127.0.0.1:27017/instgram-app-1");
 
 app.use(express.urlencoded({ extended: false })); // middleware - Plugin
 
-app.use("/user", userRouter);
+app.use("/user", userRouter);   // if any request hit on /user, use userouter
 
 
 
