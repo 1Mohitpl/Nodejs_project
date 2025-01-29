@@ -1,6 +1,5 @@
 const express = require("express");
 const router = express.Router();
-const Customer = require("../models/User"); // Assuming you have a Mongoose model for the User collection
 const { handlegetallusers , getbyid, getbygender, getpatch, deleteUser, postuser } = require("../Controllers/user");
 
 // Middleware 1: Log request time
@@ -34,4 +33,3 @@ router.delete("/id/:id", deleteUser);
 router.post("/", postuser);
 
 module.exports = router;
-

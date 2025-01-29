@@ -51,15 +51,21 @@ async function getbygender(req, res) {
 async function getpatch(req, res) {
   try {
     const userId = req.params.id;
-    const { last_name } = req.body;
-    if (!last_name) {
-      return res.status(400).json({ error: "Last name is required for update" });
+    const { last_name, Job_title } = req.body; // Extract both fields from request body
+
+    if (!last_name && !Job_title) {
+      return res.status(400).json({ error: "At least one field (last_name or Job_title) is required for update" });
     }
+
+    // Create an update object dynamically
+    const updateFields = {};
+    if (last_name) updateFields.last_name = last_name;
+    if (Job_title) updateFields.Job_title = Job_title;
 
     const updatedUser = await customer.findByIdAndUpdate(
       userId,
-      { last_name },
-      { new: true } // Return the updated document
+      updateFields,  // Pass the dynamically created object
+      { new: true }  // Return the updated document
     );
 
     if (updatedUser) {
@@ -71,12 +77,11 @@ async function getpatch(req, res) {
     console.error("Error updating user by ID:", error);
     return res.status(500).json({ error: "Internal server error" });
   }
-  
 }
 
 
 
-async function deleteUser(params) {
+async function deleteUser(req, res) {
   try {
     const userId = req.params.id;
     const deletedUser = await customer.findByIdAndDelete(userId);
@@ -92,7 +97,7 @@ async function deleteUser(params) {
   }
 }
 
-async function postuser(params) {
+async function postuser(req, res) {
   try {
     const { first_name, last_name, email, gender, Job_title } = req.body;
 
@@ -107,7 +112,7 @@ async function postuser(params) {
       last_name,
       email,
       gender,
-      Job_title,
+      Job_title, // Ensure this matches your database field name
     });
 
     const result = await newUser.save(); // Save to MongoDB
